@@ -23,13 +23,13 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
-import cv2
+#import cv2
 
 # Show the figures / plots inside the notebook
 def show_images(images,titles=None):
     #This function is used to show image(s) with titles by sending an array of images and an array of associated titles.
-    # images[0] will be drawn with the title titles[0] if exists
-    # You aren't required to understand this function, use it as-is.
+    #images[0] will be drawn with the title titles[0] if exists
+    #You aren't required to understand this function, use it as-is.
     n_ims = len(images)
     if titles is None: titles = ['(%d)' % i for i in range(1,n_ims + 1)]
     fig = plt.figure()
