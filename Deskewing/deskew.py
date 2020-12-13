@@ -22,6 +22,5 @@ def deskew(img):
     if(trueAngle == 46):
         rotated = inter.rotate(img, 90, reshape=True, order=0)
     else:
-        rotated = inter.rotate(img, trueAngle, reshape=False, order=0)
-        print(trueAngle)
+        rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
     return rotated
