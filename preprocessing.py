@@ -1,24 +1,43 @@
+import cv2
+import skimage.io as io
+import numpy as np
+import scipy
+from skimage.morphology import binary_erosion, binary_dilation, binary_closing,skeletonize, thin
+from scipy.signal import convolve2d
+from statistics import mode,variance
+from math import sqrt
+from skimage.measure import find_contours
+import matplotlib.pyplot as plt 
+from skimage import data, color, img_as_ubyte 
+from skimage.feature import canny 
+from skimage.transform import hough_ellipse 
+from skimage.draw import ellipse_perimeter 
+from skimage.draw import rectangle
+from skimage.morphology import disk
+from scipy.spatial.distance import euclidean
+from skimage.util.shape import view_as_windows
+from pip._internal import main as install
+from pylab import imshow, gray, show 
+from math import pi
+from scipy.ndimage import interpolation as inter
+from skimage.filters import threshold_otsu
+
 def deskew(img):
-    initAngle = 45
-    angles = np.arange(-initAngle, initAngle + 1, 1)
-    scoreArray = np.zeros(92)
-    for i in angles:
+    scoreArray = np.zeros(362)
+    i = 0
+    while i <= 360:
         data = inter.rotate(img, i, reshape=False, order=0)
         sumRow = np.sum(data, axis=1)
         score = np.sum((sumRow[1:] - sumRow[:-1]) ** 2)
-        scoreArray[i+45] = score
-
-    data = inter.rotate(img, 90, reshape=True, order=0)
-    sumRow90 = np.sum(data, axis=1)
-    score90 = np.sum((sumRow90[1:] - sumRow90[:-1]) ** 2)
-    scoreArray[91] = score90
-
+        scoreArray[i] = score
+        i+=1
     scoreArray = np.array(scoreArray)
-    trueAngle = np.where(scoreArray == max(scoreArray))[0][0] - 45
-    if(trueAngle == 46):
-        rotated = inter.rotate(img, 90, reshape=True, order=0)
-    else:
-        rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
+    trueAngle = np.where(scoreArray == max(scoreArray))[0][0]
+    rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
+    return rotated
+
+def rotateBy(img,trueAngle):
+    rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
     return rotated
 
 def feng_threshold(img, w_size1=15, w_size2=30,
@@ -175,6 +194,27 @@ def applyPoison(img,s,L):
     img=poisonScreening(img,L)
     img=simplestColorBalance(img,s)
     return img
+
+#illumination test
+
+#determine if the image needs illumination evening and if it need feng thresholding 
+#if image has uneven illumination => use poisson
+#if image has uneven illumination or a very low contrast(another function not done yet) => use feng
+#Return True if image is good and false if image is uneven
+def imageState(imgGray):
+    blurred = cv2.GaussianBlur(imgGray, (25, 25), 0)
+    no_text = imgGray * ((imgGray/blurred)>0.99)                
+    no_text[no_text<10] = no_text[no_text>20].mean()      
+    no_bright = no_text.copy()
+    no_bright[no_bright>220] = no_bright[no_bright<220].mean()
+    std = no_bright.std()
+    bright = (no_text>220).sum()
+    if std>18 or (no_text.mean()<200 and bright>8000):
+        return False
+    else:
+        return True
+
+#prespective correction
 def prespectiveCorrection(RotatedImage):
     #rotated image is the image returned from the deskew directly
     RotatedImage = RotatedImage*255
@@ -276,16 +316,27 @@ def prespectiveCorrection(RotatedImage):
         warped = RotatedImage
         
     return warped
+
+
+
+
 def preprocessing(imgPath):
     img= cv2.imread(imgPath) 
     gray_img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) 
-    IlluminatedImage=applyPoison(gray_img,0.1,0.1)
-    IlluminatedImage=IlluminatedImage.astype(np.uint8)
+    isEven = imageState(gray_img)
+    IlluminatedImage=gray_img
+    if(not isEven):
+        IlluminatedImage=applyPoison(gray_img,0.1,0.1)
+        IlluminatedImage=IlluminatedImage.astype(np.uint8)
     smoothedImage=smooth(IlluminatedImage)
-    BinarizedImage=feng_threshold(smoothedImage)
+    if  not isEven:
+        BinarizedImage=feng_threshold(smoothedImage)
+    else:
+        t =threshold_otsu(smoothedImage)
+        BinarizedImage=np.where(smoothedImage>t,1,0)
     BinarizedImage=1-BinarizedImage
     RotatedImage=deskew(BinarizedImage)
-    correctedImg=prespectiveCorrection(RotatedImage)
-    BinarizedImage=1-correctedImg
+    #correctedImg=prespectiveCorrection(RotatedImage)
+    BinarizedImage=1-RotatedImage
     cv2.imwrite("Binarized.png",BinarizedImage*255)
     return BinarizedImage
