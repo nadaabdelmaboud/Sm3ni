@@ -1,4 +1,6 @@
 from preprocessing import *
+from staffremoval import *
 
 
-preprocessing("01.PNG")
+BinarizedImage = preprocessing("01.PNG")
+staffRemoval(BinarizedImage)
