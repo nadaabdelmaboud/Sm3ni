@@ -26,26 +26,25 @@ outputFolder = args.outputfolder
 digitsFileModel = 'models/digits_model.sav'
 symbolsFileModel = 'models/symbols_model.sav'
 accedintalsFileModel = 'models/accedintals_model.sav'
-# deskewedFileModel = 'models/deskew_model.sav'
+
 loaded_digits_model = pickle.load(open(digitsFileModel, 'rb'))
 loaded_symbols_model = pickle.load(open(symbolsFileModel, 'rb'))
 loaded_accedintals_model = pickle.load(open(accedintalsFileModel, 'rb'))
-# loaded_deskew_model = pickle.load(open(deskewedFileModel, 'rb'))
 
-for i, filename in enumerate(os.listdir(inputFolder)):
+for fNum, filename in enumerate(os.listdir(inputFolder)):
     binarizedImg = preprocessing(inputFolder + '/' + filename)
     isHorizontal = getHorizontalLines(binarizedImg)
     if(isHorizontal):
-        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemoval(
-            binarizedImg)
+        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemoval(binarizedImg)
     else:
-        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemovalNonHorizontal(
-            binarizedImg)
+        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects = staffRemovalNonHorizontal(binarizedImg)
+
     outFileName = filename.split('.')[0]
     f = open(outputFolder + '/' + outFileName+'.txt', "w")
-    index = 0
+
     if(len(segContours) > 1):
         f.write("{\n")
+
     for i, seg in enumerate(segContours):
         nums = []
         f.write("[ ")
@@ -61,26 +60,29 @@ for i, filename in enumerate(os.listdir(inputFolder)):
                 else:
                     nums.append(4)
                 if(len(nums) == 2):
-                    lineOut = '\meter<"' + \
-                        str(nums[0])+'/'+str(nums[1])+'">'
+                    lineOut = '\meter<"' + str(nums[0])+'/'+str(nums[1])+'">'
                     f.write(lineOut)
             else:
-                features, Bblobs, Wblobs = extractFeatures(image, maxSpace)
-                if((len(Bblobs)+len(Wblobs)) > 0):
-                    ClassifierVote = loaded_symbols_model.predict([features])[
-                        0]
-                    if isHorizontal:
-                        className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i]
-                                                                [j][2], segContoursDim[i][j][0], segPeakMids[i], segWidths[i], index)
+                if(isHorizontal):
+                    features, Bblobs, Wblobs = extractFeatures(image, maxSpace)
+                else:
+                    features, Bblobs, Wblobs = extractFeatures(image, maxSpace,segAspects[i][j])
+
+                if((len(Bblobs)+len(Wblobs)) > 0 and features[5]<=3 and features[4]<=3):
+                    print("f : ",i,j)
+                    print(features)
+                    #cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
+                    ClassifierVote = loaded_symbols_model.predict([features])[0]
+                    if(isHorizontal):
+                        className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i], segWidths[i])
                     else:
-                        className,Notes,duration=NoteOut(ClassifierVote,Bblobs,Wblobs,segContoursDim[i][j][2],segContoursDim[i][j][0],segPeakMids[i][j],segWidths[i][j],index,maxSpace)
+                        className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i][j], segWidths[i][j],maxSpace)
+                  
                     if(hasAccidental):
-                        
                         lineOut = formatLine(className,Notes,duration,accidental)
                         hasAccidental=False
                     else:
-                        lineOut = formatLine(
-                            className, Notes, duration, '')
+                        lineOut = formatLine(className, Notes, duration, '')
                     f.write(lineOut)
                 else:
                     # call accidentals classifier
@@ -91,15 +93,11 @@ for i, filename in enumerate(os.listdir(inputFolder)):
                     if(accidental == 'clef' or accidental == 'bar'):
                         hasAccidental = False
                     elif(accidental == '.'):
-                        w = segContoursDim[i][j][1] - \
-                            segContoursDim[i][j][0]
-                        h = segContoursDim[i][j][3] - \
-                            segContoursDim[i][j][2]
+                        w = segContoursDim[i][j][1] - segContoursDim[i][j][0]
+                        h = segContoursDim[i][j][3] - segContoursDim[i][j][2]
                         if(h/w > 1.2 or h/w < 0.8):
                             hasAccidental = False
-                
-
-            index += 1
+           
         if i == len(segContours)-1:
             f.write("]")
         else:

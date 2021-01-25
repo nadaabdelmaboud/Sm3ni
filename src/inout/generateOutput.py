@@ -25,7 +25,7 @@ def getNoteName(row, col, peaksMids, width,maxSpace):
         spaces.append(maxSpace)
 
     while len(widths) < 5:
-        widths.append(widths[len(widths)-1]+maxSpace)
+        widths.append(widths[len(widths)-1])
 
     if(row == segment[0] or (row <= segment[0]+threshold and row >= segment[0]-threshold)):
         note = "f2"
@@ -64,7 +64,7 @@ def getNoteName(row, col, peaksMids, width,maxSpace):
     return note
 
 
-def NoteOut(classifierVote, Bblobs, Wblobs, Ymin, Xmin, peaksMids, widths, ind , maxSpace=0):
+def NoteOut(classifierVote, Bblobs, Wblobs, Ymin, Xmin, peaksMids, widths,maxSpace=0):
 
     BlobsCenters = []
     NoteName = ''

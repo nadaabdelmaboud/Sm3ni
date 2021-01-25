@@ -155,11 +155,13 @@ def removeStaffLines(imgSegments):
 def checkOverlapped(c,imgContours):
     cXmin,cXmax,cYmin,cYmax = c
     for Xmin,Xmax,Ymin,Ymax in imgContours:
-        if(cXmin > Xmin and cXmax < Xmax and cYmin > Ymin and cYmax < Ymax):
+        if(cXmin > Xmin and cXmax < Xmax and cYmin >= Ymin and cYmax <= Ymax):
             return True
     return False
-def filterContours(imgContours):
+def filterContours(imgContours,twoDim=False,imgSlice=[]):
     filtered=[]
+    filteredSlice=[]
+    i=0
     for c in imgContours:
         XminC,XmaxC,YminC,YmaxC = c
         width = XmaxC - XminC
@@ -168,9 +170,16 @@ def filterContours(imgContours):
             continue
         isRectH = width / height > 4 and height <= 6
         isRectV = height / width > 4 and width <= 6
-        if(not checkOverlapped(c,imgContours) and not isRectH and not isRectV):
-            filtered.append(c)
+        if(twoDim):
+            if(not checkOverlapped(c,imgContours) and not isRectH and not isRectV):
+                filtered.append(c)
+                filteredSlice.append(imgSlice[i])
+        else:
+            if(not checkOverlapped(c,imgContours) and not isRectH and not isRectV):
+                filtered.append(c)
+        i+=1
     filtered.sort()
+    filteredSlice.sort()
     #############################################
     for index in range(len(filtered)-1):
         XminC,XmaxC,YminC,YmaxC = filtered[index]
@@ -181,7 +190,10 @@ def filterContours(imgContours):
             filtered[index] = filtered[index+1]
             filtered[index+1] = temp
     #############################################
-    return filtered
+    if(twoDim):
+        return filtered,filteredSlice
+    else:
+        return filtered
 
 def isNum(imgContours):
     isNUMList = np.zeros(len(imgContours))
@@ -277,8 +289,6 @@ def removeStaffInitial(img):
     imgRemovedSymbols=removeSymbol(img,imgLines,staffH,staffS)
     neg=img-imgRemovedSymbols
     neg=neg.astype(np.float)
-    ST=np.ones((5,5))
-    neg=cv2.dilate(neg,ST)
     neg =1-neg
     return staffS,staffH,neg
 
@@ -286,19 +296,24 @@ def removeStaffInitial(img):
 def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
     contours = find_contours(imgWithoutStaff, 0.8)
     imgContours=[]
+    imgRealDim=[]
     imgSymbols=[]
     imgSymbolsNoStaff=[]
+    aspects=[]
     index=0
+    h,w = imgWithStaff.shape
     for contour in contours:
         x = contour[:,1]
         y = contour[:,0]
         [Xmin, Xmax, Ymin, Ymax] = [np.amin(x), np.amax(x), np.amin(y), np.amax(y)]
-        imgContours.append([Xmin, Xmax, Ymin, Ymax])
+        imgContours.append([Xmin, Xmax, 0, h])
+        imgRealDim.append([Xmin, Xmax, Ymin, Ymax])
+        aspects.append((Ymax-Ymin)/(Xmax-Xmin))
 
-    h,w = imgWithStaff.shape
-    imgContours = filterContours(imgContours)
-    isNUMList = isNum(imgContours)
-    for Xmin,Xmax,Ymin,Ymax in imgContours:
+    imgRealDim,imgContours = filterContours(imgRealDim,True,imgContours)
+    isNUMList = isNum(imgRealDim)
+
+    for Xmin,Xmax,Ymin,Ymax in imgRealDim:
         imgSymbol = imgWithStaff[0:h,int(Xmin):int(Xmax+1)]
         imgSymbolNoStaff = imgWithoutStaff[0:h,int(Xmin):int(Xmax+1)]
 
@@ -319,12 +334,13 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
         imgSymbols.append(imgSymbol)
         imgSymbolsNoStaff.append(imgSymbolNoStaff)
         index+=1
-    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList
+    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList,aspects
 
 #################Second method
 
 def staffRemovalNonHorizontal(BinarizedImage):
     staffS,staffH,staffFree = removeStaffInitial(1-BinarizedImage)
+ #   staffS+=1
     maxProjection,result=rowProjection(1-staffFree)
     #estimate staff segment position
     segWidth,segMids=calcSegmentPos(result,60)
@@ -337,31 +353,17 @@ def staffRemovalNonHorizontal(BinarizedImage):
     checkNumList=[]
     segContoursPeakmids=[]
     segContoursWidth=[]
+    segAspects=[]
     i=0
-    j=0
-    for img in imgSegmentsStaff:
-        cv2.imwrite("segments/"+str(i)+"_"+str(j)+".png",img*255)
-        j+=1
-
     for imgSeg in imgSegments:
-        imgContours,imgContoursNoStaff,imgContoursDim,isNum = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
-        ###############################################for testing###################################################
-        j=0
-        for img in imgContoursNoStaff:
-            cv2.imwrite("staffRemoved/"+str(i)+"_"+str(j)+".png",img*255)
-            j+=1
-        j=0
-        for img in imgContours:
-            cv2.imwrite("contours/"+str(i)+"_"+str(j)+".png",img*255)
-            j+=1
-        ###################################################
+        imgContours,imgContoursNoStaff,imgContoursDim,isNum,aspects = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
         segContourWidth=[]
         segContourPeakmids=[]
         #remove staff from array of imgs
         for cimg in imgContours:
             cimg=1-cimg
             maxProjection,result=rowProjection(cimg)
-            staffWidth,peaksMids=calcStaffPos(result,maxProjection,0.8)
+            staffWidth,peaksMids=calcStaffPos(result,maxProjection,0.85)
             segContourWidth.append(staffWidth)
             segContourPeakmids.append(peaksMids)
         segContoursDim.append(imgContoursDim)
@@ -369,5 +371,6 @@ def staffRemovalNonHorizontal(BinarizedImage):
         checkNumList.append(isNum)
         segContoursPeakmids.append(segContourPeakmids)
         segContoursWidth.append(segContourWidth)
+        segAspects.append(aspects)
         i+=1
-    return segContours,segContoursDim,staffS,checkNumList,segContoursPeakmids,segContoursWidth
+    return segContours,segContoursDim,staffS,checkNumList,segContoursPeakmids,segContoursWidth,segAspects
