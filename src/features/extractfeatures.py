@@ -1,8 +1,7 @@
-from Blobs import *
-from globalfeatures import *
-from flagextraction import *
-from Beams import *
-from Blobs_VerticalLines import *
+from features.Blobs import *
+from features.flagextraction import *
+from features.Beams import *
+from features.Blobs_VerticalLines import *
 import numpy as np
 from skimage.morphology import thin
 
@@ -15,7 +14,6 @@ def checkLines(width, height, linesCount, maxSpace, BblobsCount, WblobsCount):
 
 def extractFeatures(symbol, maxSpace):
     features = []
-    GFeatures = globalFeaturesExtraction(symbol)
 
     removed, count, blobOut, lines, maxProjectedLine = detectBeams(
         symbol, maxSpace)
