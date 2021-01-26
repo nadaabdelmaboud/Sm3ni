@@ -91,34 +91,25 @@ def NoteOut(classifierVote, Bblobs, Wblobs, Ymin, Xmin, peaksMids, widths,maxSpa
         Notes.append(NoteName)
     return className, Notes, duration
 
-
 def formatLine(className, Notes, duration, accidental):
     outLine = ''
+    if(accidental=='.'):
+        accidental=''
     if(className == 'c'):
         Notes = sorted(Notes, key=str.lower)
         outLine = ' {'
         for note in Notes:
             if(len(note)>=2):
-                if(accidental == '.'):
-                    outLine += accidental+' '+note[0]+note[1]+'/'+str(duration)+','
-                else:
-                    outLine += note[0]+accidental+note[1]+'/'+str(duration)+','
+                outLine += note[0]+accidental+note[1]+'/'+str(duration)+','
         outLine = outLine[0:len(outLine)-1]
         outLine += '}'
     elif(className[0:2] == "be"):
         for note in Notes:
             if(len(note)>=2):
-                if(accidental == '.'):
-                    outLine += accidental+' '+note[0]+note[1]+'/'+str(duration)
-                else:
-                    outLine += ' '+note[0]+accidental+note[1]+'/'+str(duration)
+                outLine += ' '+note[0]+accidental+note[1]+'/'+str(duration)
 
     elif len(Notes) > 0:
         if(len(Notes[0])>=2):
-            if(accidental == '.'):
-                outLine += accidental+' ' + \
-                    Notes[0][0]+Notes[0][1]+'/'+str(duration)
-            else:
-                outLine += ' '+Notes[0][0]+accidental+Notes[0][1]+'/'+str(duration)
+            outLine += ' '+Notes[0][0]+accidental+Notes[0][1]+'/'+str(duration)
 
     return outLine
