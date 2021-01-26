@@ -1,6 +1,6 @@
 import skimage.measure as measure
 from skimage.morphology import disk
-from Blobs_VerticalLines import *
+from features.Blobs_VerticalLines import *
 
 #CREDITS TO Learn python and open cv documentation
 

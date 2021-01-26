@@ -1,8 +1,7 @@
-from Blobs import *
-from globalfeatures import *
-from flagextraction import *
-from Beams import *
-from Blobs_VerticalLines import *
+from features.Blobs import *
+from features.flagextraction import *
+from features.Beams import *
+from features.Blobs_VerticalLines import *
 import numpy as np
 from skimage.morphology import thin
 
@@ -13,20 +12,18 @@ def checkLines(width, height, linesCount, maxSpace, BblobsCount, WblobsCount):
     return False
 
 
-def extractFeatures(symbol, maxSpace):
+def extractFeatures(symbol, maxSpace,aspectratio=0):
     features = []
-    GFeatures = globalFeaturesExtraction(symbol)
 
-    removed, count, blobOut, lines, maxProjectedLine = detectBeams(
-        symbol, maxSpace)
+    removed, count, blobOut, lines, maxProjectedLine = detectBeams(symbol, maxSpace)
     nOfBlack, BlackCentroids, Bblobs = detectBlackBlob(blobOut, maxSpace)
     nOfWhite = 0
     WhiteCentroids = []
     Wblobs = []
     if(nOfBlack == 0):
         nOfWhite, WhiteCentroids, Wblobs = detectWhiteBlob(blobOut, maxSpace)
-    nOfChords, ChordsCentroids, Cblobs = detectOneLinedChords(
-        blobOut, maxSpace)
+    nOfChords, ChordsCentroids, Cblobs = detectOneLinedChords(blobOut, maxSpace)
+    
     nOfBlack, BlackCentroids, Bblobs, nOfWhite, WhiteCentroids, Wblobs = setBlobsProperties(
         nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfChords, ChordsCentroids, Bblobs, Wblobs, Cblobs)
     upOrdown = setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite,
@@ -66,5 +63,9 @@ def extractFeatures(symbol, maxSpace):
     features.append(upOrdown)
     features.append(countV)
     features.append(countInvertedV)
-    features.append(symbol.shape[0]/symbol.shape[1])
+    if(aspectratio == 0):
+        print("hi",symbol.shape[0]/symbol.shape[1])
+        features.append(symbol.shape[0]/symbol.shape[1])
+    else:
+        features.append(aspectratio)
     return features, BlackCentroids, WhiteCentroids
