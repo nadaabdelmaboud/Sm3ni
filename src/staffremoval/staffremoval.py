@@ -123,11 +123,11 @@ def segmenting(BinarizedImage,thres):
     imgSegments = imgStaffSegments(img,segMids,segWidth,maxSpace,img,False)
     return imgSegments,maxSpace
 
-def removeStaffRow(imgOriginal,midPoint,curWidth):
-    thresPixel=curWidth
+def removeStaffRow(imgOriginal,midPoint,curWidth,index=0):
+    thresPixel=curWidth+1
     for i in range(imgOriginal.shape[1]):
-        pixelSum= sum(imgOriginal[int(midPoint-.5*curWidth-1):int(midPoint+.5*curWidth+1),i:i+1])
-        if(pixelSum<=thresPixel+1):
+        pixelSum= sum(imgOriginal[int(midPoint-curWidth):int(midPoint+curWidth),i:i+1])
+        if(pixelSum<=thresPixel):
             imgOriginal[midPoint-curWidth:midPoint+curWidth,i:i+1]=0
     return imgOriginal
 
@@ -147,19 +147,21 @@ def removeStaffLines(imgSegments,maxSpace=0):
         tmpStaffWidth=staffWidth
         peaksMids=list(peaksMids)
         staffWidth=list(staffWidth)
-        peaksMids.insert(0,peaksMids[0]-maxSpace-2*staffWidth[0])
-        staffWidth.insert(0,staffWidth[0])
-        peaksMids.insert(0,peaksMids[0]-maxSpace-2*staffWidth[0])
-        staffWidth.insert(0,staffWidth[0])
-        peaksMids.append(peaksMids[len(peaksMids)-1]+maxSpace+2*staffWidth[len(staffWidth)-1])
-        staffWidth.append(staffWidth[len(staffWidth)-1])
+        newWidth=staffWidth[0]+2
+        peaksMids.insert(0,peaksMids[0]-maxSpace-int(staffWidth[0]/2)-int(newWidth/2))
+        staffWidth.insert(0,newWidth)
+        peaksMids.insert(0,peaksMids[0]-maxSpace-int(staffWidth[0]/2)-int(newWidth/2))
+        staffWidth.insert(0,newWidth)
+        newWidth=staffWidth[len(staffWidth)-1]+2
+        peaksMids.append(peaksMids[len(peaksMids)-1]+maxSpace+int(staffWidth[len(staffWidth)-1]/2)+int(newWidth/2))
+        staffWidth.append(newWidth)
         peaksMids=np.array(peaksMids)
         staffWidth=np.array(staffWidth)
         simg=simg.astype(np.float)
         ST=np.ones((2,1))
         simg=cv2.dilate(simg,ST)
         for i in range(len(peaksMids)):
-            simg=removeStaffRow(simg,peaksMids[i],staffWidth[i])
+            simg=removeStaffRow(simg,peaksMids[i],staffWidth[i],i)
         ST=np.ones((1,2))
         simg=cv2.dilate(simg,ST)
         simg=1-simg
@@ -184,6 +186,8 @@ def filterContours(imgContours,twoDim=False,imgSlice=[]):
         width = XmaxC - XminC
         height = YmaxC - YminC
         if height == 0 or width == 0:
+            continue
+        if(width<=5 and height>2*width):
             continue
         isRectH = width / height > 4 and height <= 6
         isRectV = height / width > 4 and width <= 6

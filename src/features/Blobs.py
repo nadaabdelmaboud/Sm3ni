@@ -31,14 +31,16 @@ def testBlob(blob, maxSpace, widthError):
     height = blob.bbox[2]-blob.bbox[0]
     minEccentricity = .3
     maxEccentricity = .9
-    minArea = .5*(maxSpace**2)
+    minArea = .4*(maxSpace**2)
     maxArea = 4*(maxSpace**2)
-    minMajorAxis = .9*maxSpace
+    minMajorAxis = .8*maxSpace
     maxMajorAxis = 3.2*maxSpace
-    minMinorAxis = .5*maxSpace
+    minMinorAxis = .4*maxSpace
     maxMinorAxis = 2*maxSpace
     minSolidity = .8
+    print("blob: ",maxSpace,width,height,blob.solidity,blob.area,blob.eccentricity)
     if(blob.solidity >= minSolidity and blob.area > minArea and blob.area < maxArea and blob.eccentricity > minEccentricity and blob.eccentricity < maxEccentricity and width > minMajorAxis and width < maxMajorAxis and height > minMinorAxis and height < maxMinorAxis):
+        print("True")
         return True
     return False
 
@@ -124,7 +126,7 @@ def detectOneLinedChords(contour, maxSpace):
 
 
 def isDublicate(blob1, blob2):
-    error = 3
+    error = 4
     maxX = 0
     minX = 0
     if(blob2[0] > blob1[0]):
