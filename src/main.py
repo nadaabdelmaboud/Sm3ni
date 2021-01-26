@@ -97,7 +97,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                         h = segContoursDim[i][j][3] - segContoursDim[i][j][2]
                         if(h/w > 1.2 or h/w < 0.8):
                             hasAccidental = False
-           
+                        f.write(accidental)
         if i == len(segContours)-1:
             f.write("]")
         else:
