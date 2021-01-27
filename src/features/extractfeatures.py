@@ -22,15 +22,12 @@ def extractFeatures(symbol, maxSpace,aspectratio=0,width=0,height=0,Y=0):
 
     removed, count, blobOut, lines, maxProjectedLine = detectBeams(symbol, maxSpace,height,width)
     nOfBlack, BlackCentroids, Bblobs = detectBlackBlob(blobOut, maxSpace)
-    print("maxProjectedLine : ",maxProjectedLine)
-    print("BlackCentroids : ",BlackCentroids)
     nOfWhite = 0
     WhiteCentroids = []
     Wblobs = []
     if(nOfBlack == 0):
         nOfWhite, WhiteCentroids, Wblobs = detectWhiteBlob(blobOut, maxSpace)
     nOfChords, ChordsCentroids, Cblobs = detectOneLinedChords(blobOut, maxSpace)
-    print("Chords ",ChordsCentroids)
     nOfBlack, BlackCentroids, Bblobs, nOfWhite, WhiteCentroids, Wblobs = setBlobsProperties(
         nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfChords, ChordsCentroids, Bblobs, Wblobs, Cblobs)
     upOrdown = setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite,

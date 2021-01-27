@@ -3,10 +3,6 @@ from features.Blobs_VerticalLines import *
 
 
 def checkBeams(width, height, linesCount, maxSpace):
-    # print("width",width)
-    # print("height",height)
-    # print("linesCount",linesCount)
-    # print("maxSpace",maxSpace)
     if width > 3*maxSpace and height > 2.5*maxSpace and linesCount > 1:
         return True
     return False

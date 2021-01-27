@@ -329,6 +329,23 @@ def removeStaffInitial(img):
     neg =1-neg
     return staffS,staffH,neg
 
+def getLargestContour(img):
+    contours = find_contours(img, 0.8)
+    area=0
+    h=w=0
+    for contour in contours:
+        x = contour[:,1]
+        y = contour[:,0]
+        [Xmin, Xmax, Ymin, Ymax] = [np.amin(x), np.amax(x), np.amin(y), np.amax(y)]
+        curH = Ymax-Ymin
+        curW = Xmax-Xmin
+        if(curH*curW > area):
+            area = curH*curW
+            h = curH
+            w = curW
+    return h,w
+
+
 #convert image into contours
 def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
     contours = find_contours(imgWithoutStaff, 0.8)
@@ -354,9 +371,6 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
     isNUMList = isNum(imgRealDim)
 
     for Xmin,Xmax,Ymin,Ymax in imgRealDim:
-        aspects.append((Ymax-Ymin)/(Xmax-Xmin))
-        widths.append(Xmax-Xmin)
-        heights.append(Ymax-Ymin)
         yMins.append(Ymin)
         imgSymbol = imgWithStaff[0:h,int(Xmin):int(Xmax+1)]
         imgSymbolNoStaff = imgWithoutStaff[0:h,int(Xmin):int(Xmax+1)]
@@ -379,8 +393,14 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
         else:
             errorRotation.append(2)
         imgSymbolNoStaff = rotateBy(imgSymbolNoStaff,angle)
+
         imgSymbolNoStaff = 1 -imgSymbolNoStaff
+
+        cHeight,cWidth = getLargestContour(imgSymbolNoStaff)
         
+        aspects.append(cHeight/cWidth)
+        widths.append(cWidth)
+        heights.append(cHeight)
 
         imgSymbols.append(imgSymbol)
         imgSymbolsNoStaff.append(imgSymbolNoStaff)

@@ -38,9 +38,7 @@ def testBlob(blob, maxSpace, widthError):
     minMinorAxis = .4*maxSpace
     maxMinorAxis = 2*maxSpace
     minSolidity = .8
-    print("blob: ",maxSpace,width,height,blob.solidity,blob.area,blob.eccentricity)
     if(blob.solidity >= minSolidity and blob.area > minArea and blob.area < maxArea and blob.eccentricity > minEccentricity and blob.eccentricity < maxEccentricity and width > minMajorAxis and width < maxMajorAxis and height > minMinorAxis and height < maxMinorAxis):
-        print("True")
         return True
     return False
 
@@ -186,10 +184,8 @@ def setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, lines,
     # error=maxSpace
     thres = Y+height-maxProjectedLine-1
     thres = thres+error
-    print(height,maxProjectedLine,thres)
     if(nOfBlack > 0):
         heighestBlob = np.amin(BlackCentroids, 0)[0]
-        print("heighestBlob",heighestBlob)
         if(heighestBlob < thres):
             return 1
         else:

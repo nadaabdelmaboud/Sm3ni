@@ -41,7 +41,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
         segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects ,widths,heights,Ys= staffRemovalNonHorizontal(binarizedImg)
 
     outFileName = filename.split('.')[0]
-    f = open(outputFolder + '/g' + outFileName+'.txt', "w")
+    f = open(outputFolder + '/' + outFileName+'.txt', "w")
 
     if(len(segContours) > 1):
         f.write("{\n")
@@ -51,11 +51,11 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
         f.write("[ ")
         hasAccidental = False
         accidental = ""
+        hasNum= sum(checkNumList[i])> 0
+        
         for j, image in enumerate(seg):
-           # cv2.imwrite("cont/"+str(index)+".png",image*255)
             index+=1
             if checkNumList[i][j] == 1:
-                #cv2.imwrite("num"+str(i)+"_"+str(j)+".png",image*255)
                 features = extractDigitsFeatures(image)
                 result = loaded_digits_model.predict([features])
                 c = result[0]
@@ -66,18 +66,17 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                 if(len(nums) == 2):
                     lineOut = '\meter<"' + str(nums[0])+'/'+str(nums[1])+'">'
                     f.write(lineOut)
+                    hasNum=False
             else:
+                if(hasNum):
+                    continue
                 if(isHorizontal):
                     features, Bblobs, Wblobs = extractFeatures(image, maxSpace)
                 else:
                     features, Bblobs, Wblobs = extractFeatures(image, maxSpace,segAspects[i][j],widths[i][j],heights[i][j],Ys[i][j])
 
                 if((len(Bblobs)+len(Wblobs)) > 0):
-                    print("f : ",i,j)
-                    print(features)
-                  #  cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
                     ClassifierVote = loaded_symbols_model.predict([features])[0]
-                    print("ClassifierVote: ",ClassifierVote)
                     if(isHorizontal):
                         className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i], segWidths[i],origImg,index,0)
                     else:
@@ -88,18 +87,14 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                         hasAccidental=False
                     else:
                         lineOut = formatLine(className, Notes, duration, '')
-                    print("LineOut: ",lineOut)
                     f.write(lineOut)
                 else:
-                    # call accidentals classifier
-                    #cv2.imwrite("acc"+str(i)+"_"+str(j)+".png",image*255)
                     hasAccidental = True
                     features = extractAccedintalsFeatures(image)
                     result = loaded_accedintals_model.predict([features])
                     accidental = getAccedintals(result)
                     if(accidental=='bar' and image.shape[0]/image.shape[1]<1.1):
                         accidental='.'
-                    print("accidental ",accidental," result ",result)
                     if(accidental == 'clef' or accidental == 'bar'or image.shape[0]>5*maxSpace):
                         hasAccidental = False
                     elif(accidental == '.' and image.shape[0]<2*image.shape[1]):
