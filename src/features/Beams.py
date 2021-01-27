@@ -1,5 +1,5 @@
 from skimage.measure import label, regionprops
-from Blobs_VerticalLines import *
+from features.Blobs_VerticalLines import *
 
 
 def checkBeams(width, height, linesCount, maxSpace):

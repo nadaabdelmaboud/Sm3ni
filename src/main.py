@@ -40,7 +40,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
         segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects = staffRemovalNonHorizontal(binarizedImg)
 
     outFileName = filename.split('.')[0]
-    f = open(outputFolder + '/' + outFileName+'.txt', "w")
+    f = open(outputFolder + '/g' + outFileName+'.txt', "w")
 
     if(len(segContours) > 1):
         f.write("{\n")
@@ -71,7 +71,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                 if((len(Bblobs)+len(Wblobs)) > 0 and features[5]<=3 and features[4]<=3):
                     print("f : ",i,j)
                     print(features)
-                    #cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
+                    cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
                     ClassifierVote = loaded_symbols_model.predict([features])[0]
                     if(isHorizontal):
                         className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i], segWidths[i])

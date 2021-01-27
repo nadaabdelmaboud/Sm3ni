@@ -17,13 +17,15 @@ def extractFeatures(symbol, maxSpace,aspectratio=0):
 
     removed, count, blobOut, lines, maxProjectedLine = detectBeams(symbol, maxSpace)
     nOfBlack, BlackCentroids, Bblobs = detectBlackBlob(blobOut, maxSpace)
+    print("maxProjectedLine : ",maxProjectedLine)
+    print("BlackCentroids : ",BlackCentroids)
     nOfWhite = 0
     WhiteCentroids = []
     Wblobs = []
     if(nOfBlack == 0):
         nOfWhite, WhiteCentroids, Wblobs = detectWhiteBlob(blobOut, maxSpace)
     nOfChords, ChordsCentroids, Cblobs = detectOneLinedChords(blobOut, maxSpace)
-    
+
     nOfBlack, BlackCentroids, Bblobs, nOfWhite, WhiteCentroids, Wblobs = setBlobsProperties(
         nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfChords, ChordsCentroids, Bblobs, Wblobs, Cblobs)
     upOrdown = setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite,
@@ -64,7 +66,6 @@ def extractFeatures(symbol, maxSpace,aspectratio=0):
     features.append(countV)
     features.append(countInvertedV)
     if(aspectratio == 0):
-        print("hi",symbol.shape[0]/symbol.shape[1])
         features.append(symbol.shape[0]/symbol.shape[1])
     else:
         features.append(aspectratio)

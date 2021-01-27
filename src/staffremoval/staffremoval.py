@@ -168,8 +168,8 @@ def filterContours(imgContours,twoDim=False,imgSlice=[]):
         height = YmaxC - YminC
         if height == 0 or width == 0:
             continue
-        isRectH = width / height > 4 and height <= 6
-        isRectV = height / width > 4 and width <= 6
+        isRectH = width / height > 3 and height <= 6
+        isRectV = height / width > 3 and width <= 6
         if(twoDim):
             if(not checkOverlapped(c,imgContours) and not isRectH and not isRectV):
                 filtered.append(c)
@@ -185,7 +185,7 @@ def filterContours(imgContours,twoDim=False,imgSlice=[]):
         XminC,XmaxC,YminC,YmaxC = filtered[index]
         XminN,XmaxN,YminN,YmaxN = filtered[index+1]
         #check for numbers to sort contours from top to down and swap them if conditions satisfied
-        if (abs(XmaxC - XmaxN) <= 4 and abs (XminC - XminN) <= 4 and YminN < YminC):
+        if (abs(XmaxC - XmaxN) <= 4 and abs (XminC - XminN) <= 4 and YminN <= YminC):
             temp = filtered[index]
             filtered[index] = filtered[index+1]
             filtered[index+1] = temp
@@ -302,18 +302,19 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
     aspects=[]
     index=0
     h,w = imgWithStaff.shape
+    errorRotation=[]
     for contour in contours:
         x = contour[:,1]
         y = contour[:,0]
         [Xmin, Xmax, Ymin, Ymax] = [np.amin(x), np.amax(x), np.amin(y), np.amax(y)]
         imgContours.append([Xmin, Xmax, 0, h])
         imgRealDim.append([Xmin, Xmax, Ymin, Ymax])
-        aspects.append((Ymax-Ymin)/(Xmax-Xmin))
 
     imgRealDim,imgContours = filterContours(imgRealDim,True,imgContours)
     isNUMList = isNum(imgRealDim)
 
     for Xmin,Xmax,Ymin,Ymax in imgRealDim:
+        aspects.append((Ymax-Ymin)/(Xmax-Xmin))
         imgSymbol = imgWithStaff[0:h,int(Xmin):int(Xmax+1)]
         imgSymbolNoStaff = imgWithoutStaff[0:h,int(Xmin):int(Xmax+1)]
 
@@ -328,19 +329,26 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
         imgSymbolNoStaff = 1 -imgSymbolNoStaff
         thinned = thin(imgSymbolNoStaff)
         thinned,angle = deskew(thinned,True,0)
+        if(abs(angle) <=15):
+            errorRotation.append(0)
+        elif(abs(angle) <=30):
+            errorRotation.append(1)
+        else:
+            errorRotation.append(2)
         imgSymbolNoStaff = rotateBy(imgSymbolNoStaff,angle)
         imgSymbolNoStaff = 1 -imgSymbolNoStaff
+        
 
         imgSymbols.append(imgSymbol)
         imgSymbolsNoStaff.append(imgSymbolNoStaff)
         index+=1
-    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList,aspects
+    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList,aspects,errorRotation
 
 #################Second method
 
 def staffRemovalNonHorizontal(BinarizedImage):
     staffS,staffH,staffFree = removeStaffInitial(1-BinarizedImage)
- #   staffS+=1
+    staffS+=1
     maxProjection,result=rowProjection(1-staffFree)
     #estimate staff segment position
     segWidth,segMids=calcSegmentPos(result,60)
@@ -356,16 +364,19 @@ def staffRemovalNonHorizontal(BinarizedImage):
     segAspects=[]
     i=0
     for imgSeg in imgSegments:
-        imgContours,imgContoursNoStaff,imgContoursDim,isNum,aspects = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
+        imgContours,imgContoursNoStaff,imgContoursDim,isNum,aspects,errorRotation = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
         segContourWidth=[]
         segContourPeakmids=[]
         #remove staff from array of imgs
+        index=0
         for cimg in imgContours:
             cimg=1-cimg
             maxProjection,result=rowProjection(cimg)
-            staffWidth,peaksMids=calcStaffPos(result,maxProjection,0.85)
+            staffWidth,peaksMids=calcStaffPos(result,maxProjection,0.9)
+            peaksMids-=errorRotation[index]
             segContourWidth.append(staffWidth)
             segContourPeakmids.append(peaksMids)
+            index+=1
         segContoursDim.append(imgContoursDim)
         segContours.append(imgContoursNoStaff)
         checkNumList.append(isNum)

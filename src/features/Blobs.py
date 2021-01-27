@@ -184,8 +184,10 @@ def setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, lines,
     # error=maxSpace
     thres = height-maxProjectedLine-1
     thres = thres+error
+    print(height,maxProjectedLine,thres)
     if(nOfBlack > 0):
         heighestBlob = np.amin(BlackCentroids, 0)[0]
+        print("heighestBlob",heighestBlob)
         if(heighestBlob < thres):
             return 1
         else:
