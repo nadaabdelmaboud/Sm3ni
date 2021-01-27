@@ -179,10 +179,10 @@ def setBlobsProperties(nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfCh
     return len(BlackCentroids), BlackCentroids, Bblobs, len(WhiteCentroids), WhiteCentroids, Wblobs
 
 
-def setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, lines, maxProjectedLine, height, error):
+def setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, lines, maxProjectedLine, height, error,Y):
     # 0 for down , 1 for up , -1 for no blobs
     # error=maxSpace
-    thres = height-maxProjectedLine-1
+    thres = Y+height-maxProjectedLine-1
     thres = thres+error
     print(height,maxProjectedLine,thres)
     if(nOfBlack > 0):

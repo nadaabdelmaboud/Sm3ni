@@ -34,7 +34,7 @@ def extractFeatures(symbol, maxSpace,aspectratio=0,width=0,height=0,Y=0):
     nOfBlack, BlackCentroids, Bblobs, nOfWhite, WhiteCentroids, Wblobs = setBlobsProperties(
         nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfChords, ChordsCentroids, Bblobs, Wblobs, Cblobs)
     upOrdown = setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite,
-                                 WhiteCentroids, lines, maxProjectedLine, height, maxSpace,Bblobs,Wblobs)
+                                 WhiteCentroids, lines, maxProjectedLine, height, maxSpace,Y)
 
     s = symbol.copy()
 
