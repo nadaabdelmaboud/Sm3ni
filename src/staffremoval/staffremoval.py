@@ -289,6 +289,8 @@ def removeStaffInitial(img):
     imgRemovedSymbols=removeSymbol(img,imgLines,staffH,staffS)
     neg=img-imgRemovedSymbols
     neg=neg.astype(np.float)
+    ST=np.ones((2,3))
+    neg=cv2.dilate(neg,ST)
     neg =1-neg
     return staffS,staffH,neg
 
@@ -302,6 +304,7 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
     aspects=[]
     widths=[]
     heights=[]
+    yMins=[]
     index=0
     h = imgWithStaff.shape[0]
     errorRotation=[]
@@ -319,6 +322,7 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
         aspects.append((Ymax-Ymin)/(Xmax-Xmin))
         widths.append(Xmax-Xmin)
         heights.append(Ymax-Ymin)
+        yMins.append(Ymin)
         imgSymbol = imgWithStaff[0:h,int(Xmin):int(Xmax+1)]
         imgSymbolNoStaff = imgWithoutStaff[0:h,int(Xmin):int(Xmax+1)]
 
@@ -346,7 +350,7 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
         imgSymbols.append(imgSymbol)
         imgSymbolsNoStaff.append(imgSymbolNoStaff)
         index+=1
-    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList,aspects,errorRotation,widths,heights
+    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList,aspects,errorRotation,widths,heights,yMins
 
 #################Second method
 
@@ -368,9 +372,10 @@ def staffRemovalNonHorizontal(BinarizedImage):
     segAspects=[]
     dimWidth=[]
     dimHeight=[]
+    Ys=[]
     i=0
     for imgSeg in imgSegments:
-        imgContours,imgContoursNoStaff,imgContoursDim,isNum,aspects,errorRotation,w,h = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
+        imgContours,imgContoursNoStaff,imgContoursDim,isNum,aspects,errorRotation,w,h,yMins = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
         segContourWidth=[]
         segContourPeakmids=[]
         #remove staff from array of imgs
@@ -391,5 +396,6 @@ def staffRemovalNonHorizontal(BinarizedImage):
         segAspects.append(aspects)
         dimWidth.append(w)
         dimHeight.append(h)
+        Ys.append(yMins)
         i+=1
-    return segContours,segContoursDim,staffS,checkNumList,segContoursPeakmids,segContoursWidth,segAspects,dimWidth,dimHeight
+    return segContours,segContoursDim,staffS,checkNumList,segContoursPeakmids,segContoursWidth,segAspects,dimWidth,dimHeight,Ys

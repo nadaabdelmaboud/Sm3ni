@@ -12,8 +12,7 @@ def checkLines(width, height, linesCount, maxSpace, BblobsCount, WblobsCount):
     return False
 
 
-def extractFeatures(symbol, maxSpace,aspectratio=0,width=0,height=0):
-
+def extractFeatures(symbol, maxSpace,aspectratio=0,width=0,height=0,Y=0):
     if(aspectratio==0):
         aspectratio= symbol.shape[0]/symbol.shape[1]
         height= symbol.shape[0]
@@ -35,7 +34,7 @@ def extractFeatures(symbol, maxSpace,aspectratio=0,width=0,height=0):
     nOfBlack, BlackCentroids, Bblobs, nOfWhite, WhiteCentroids, Wblobs = setBlobsProperties(
         nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfChords, ChordsCentroids, Bblobs, Wblobs, Cblobs)
     upOrdown = setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite,
-                                 WhiteCentroids, lines, maxProjectedLine, height, maxSpace)
+                                 WhiteCentroids, lines, maxProjectedLine, height, maxSpace,Bblobs,Wblobs)
 
     s = symbol.copy()
 

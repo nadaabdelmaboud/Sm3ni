@@ -37,7 +37,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
     if(isHorizontal):
         segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemoval(binarizedImg)
     else:
-        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects ,widths,heights= staffRemovalNonHorizontal(binarizedImg)
+        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects ,widths,heights,Ys= staffRemovalNonHorizontal(binarizedImg)
 
     outFileName = filename.split('.')[0]
     f = open(outputFolder + '/g' + outFileName+'.txt', "w")
@@ -67,7 +67,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                 if(isHorizontal):
                     features, Bblobs, Wblobs = extractFeatures(image, maxSpace)
                 else:
-                    features, Bblobs, Wblobs = extractFeatures(image, maxSpace,segAspects[i][j],widths[i][j],heights[i][j])
+                    features, Bblobs, Wblobs = extractFeatures(image, maxSpace,segAspects[i][j],widths[i][j],heights[i][j],Ys[i][j])
 
                 if((len(Bblobs)+len(Wblobs)) > 0):
                     print("f : ",i,j)
