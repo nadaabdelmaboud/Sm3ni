@@ -34,6 +34,7 @@ loaded_accedintals_model = pickle.load(open(accedintalsFileModel, 'rb'))
 for fNum, filename in enumerate(os.listdir(inputFolder)):
     binarizedImg = preprocessing(inputFolder + '/' + filename)
     isHorizontal = getHorizontalLines(binarizedImg)
+    origImg=(binarizedImg*255).astype("uint8")
     if(isHorizontal):
         segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemoval(binarizedImg)
     else:
@@ -44,13 +45,15 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
 
     if(len(segContours) > 1):
         f.write("{\n")
-
+    index=0
     for i, seg in enumerate(segContours):
         nums = []
         f.write("[ ")
         hasAccidental = False
         accidental = ""
         for j, image in enumerate(seg):
+           # cv2.imwrite("cont/"+str(index)+".png",image*255)
+            index+=1
             if checkNumList[i][j] == 1:
                 #cv2.imwrite("num"+str(i)+"_"+str(j)+".png",image*255)
                 features = extractDigitsFeatures(image)
@@ -72,18 +75,20 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                 if((len(Bblobs)+len(Wblobs)) > 0):
                     print("f : ",i,j)
                     print(features)
-                    cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
+                  #  cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
                     ClassifierVote = loaded_symbols_model.predict([features])[0]
+                    print("ClassifierVote: ",ClassifierVote)
                     if(isHorizontal):
-                        className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i], segWidths[i])
+                        className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i], segWidths[i],origImg,index,0)
                     else:
-                        className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i][j], segWidths[i][j],maxSpace)
+                        className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i][j], segWidths[i][j],origImg,index,maxSpace)
                   
                     if(hasAccidental):
                         lineOut = formatLine(className,Notes,duration,accidental)
                         hasAccidental=False
                     else:
                         lineOut = formatLine(className, Notes, duration, '')
+                    print("LineOut: ",lineOut)
                     f.write(lineOut)
                 else:
                     # call accidentals classifier
@@ -92,14 +97,17 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                     features = extractAccedintalsFeatures(image)
                     result = loaded_accedintals_model.predict([features])
                     accidental = getAccedintals(result)
-                    if(accidental == 'clef' or accidental == 'bar'):
+                    if(accidental=='bar' and image.shape[0]/image.shape[1]<1.1):
+                        accidental='.'
+                    print("accidental ",accidental," result ",result)
+                    if(accidental == 'clef' or accidental == 'bar'or image.shape[0]>5*maxSpace):
                         hasAccidental = False
-                    elif(accidental == '.'):
+                    elif(accidental == '.' and image.shape[0]<2*image.shape[1]):
                         w = segContoursDim[i][j][1] - segContoursDim[i][j][0]
                         h = segContoursDim[i][j][3] - segContoursDim[i][j][2]
                         if(h/w > 1.2 or h/w < 0.8):
                             hasAccidental = False
-           
+                        f.write(accidental)
         if i == len(segContours)-1:
             f.write("]")
         else:

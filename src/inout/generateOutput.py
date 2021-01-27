@@ -14,7 +14,7 @@ def getNoteName(row, col, peaksMids, width,maxSpace):
             int(((segment[i]-segment[i-1])-int(widths[i]/2+widths[i-1]/2))))
     spaces = np.array(spaces)
     note = ''
-    threshold = 3
+    threshold = 4
     segment = list(segment)
     spaces = list(spaces)
     widths = list(widths)
@@ -26,7 +26,7 @@ def getNoteName(row, col, peaksMids, width,maxSpace):
 
     while len(widths) < 5:
         widths.append(widths[len(widths)-1])
-
+    print("note ",row,col,segment,widths)
     if(row == segment[0] or (row <= segment[0]+threshold and row >= segment[0]-threshold)):
         note = "f2"
     if(row == segment[1] or (row <= segment[1]+threshold and row >= segment[1]-threshold)):
@@ -64,7 +64,7 @@ def getNoteName(row, col, peaksMids, width,maxSpace):
     return note
 
 
-def NoteOut(classifierVote, Bblobs, Wblobs, Ymin, Xmin, peaksMids, widths,maxSpace=0):
+def NoteOut(classifierVote, Bblobs, Wblobs, Ymin, Xmin, peaksMids, widths,image,index,maxSpace=0):
 
     BlobsCenters = []
     NoteName = ''
@@ -87,38 +87,31 @@ def NoteOut(classifierVote, Bblobs, Wblobs, Ymin, Xmin, peaksMids, widths,maxSpa
     for center in BlobsCenters:
         centerx = int(center[0]+Ymin)
         centery = int(center[1]+Xmin)
+        image[centerx][centery]=150
         NoteName = getNoteName(centerx, centery, peaksMids, widths,maxSpace)
         Notes.append(NoteName)
+    cv2.imwrite("contours/"+str(index)+".png",image)
     return className, Notes, duration
-
 
 def formatLine(className, Notes, duration, accidental):
     outLine = ''
+    if(accidental=='.'):
+        accidental=''
     if(className == 'c'):
         Notes = sorted(Notes, key=str.lower)
         outLine = ' {'
         for note in Notes:
             if(len(note)>=2):
-                if(accidental == '.'):
-                    outLine += accidental+' '+note[0]+note[1]+'/'+str(duration)+','
-                else:
-                    outLine += note[0]+accidental+note[1]+'/'+str(duration)+','
+                outLine += note[0]+accidental+note[1]+'/'+str(duration)+','
         outLine = outLine[0:len(outLine)-1]
         outLine += '}'
     elif(className[0:2] == "be"):
         for note in Notes:
             if(len(note)>=2):
-                if(accidental == '.'):
-                    outLine += accidental+' '+note[0]+note[1]+'/'+str(duration)
-                else:
-                    outLine += ' '+note[0]+accidental+note[1]+'/'+str(duration)
+                outLine += ' '+note[0]+accidental+note[1]+'/'+str(duration)
 
     elif len(Notes) > 0:
         if(len(Notes[0])>=2):
-            if(accidental == '.'):
-                outLine += accidental+' ' + \
-                    Notes[0][0]+Notes[0][1]+'/'+str(duration)
-            else:
-                outLine += ' '+Notes[0][0]+accidental+Notes[0][1]+'/'+str(duration)
+            outLine += ' '+Notes[0][0]+accidental+Notes[0][1]+'/'+str(duration)
 
     return outLine
