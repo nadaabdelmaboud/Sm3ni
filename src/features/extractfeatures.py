@@ -12,10 +12,16 @@ def checkLines(width, height, linesCount, maxSpace, BblobsCount, WblobsCount):
     return False
 
 
-def extractFeatures(symbol, maxSpace,aspectratio=0):
+def extractFeatures(symbol, maxSpace,aspectratio=0,width=0,height=0):
+
+    if(aspectratio==0):
+        aspectratio= symbol.shape[0]/symbol.shape[1]
+        height= symbol.shape[0]
+        width= symbol.shape[1]
+
     features = []
 
-    removed, count, blobOut, lines, maxProjectedLine = detectBeams(symbol, maxSpace)
+    removed, count, blobOut, lines, maxProjectedLine = detectBeams(symbol, maxSpace,height,width)
     nOfBlack, BlackCentroids, Bblobs = detectBlackBlob(blobOut, maxSpace)
     print("maxProjectedLine : ",maxProjectedLine)
     print("BlackCentroids : ",BlackCentroids)
@@ -29,7 +35,7 @@ def extractFeatures(symbol, maxSpace,aspectratio=0):
     nOfBlack, BlackCentroids, Bblobs, nOfWhite, WhiteCentroids, Wblobs = setBlobsProperties(
         nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfChords, ChordsCentroids, Bblobs, Wblobs, Cblobs)
     upOrdown = setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite,
-                                 WhiteCentroids, lines, maxProjectedLine, symbol.shape[0], maxSpace)
+                                 WhiteCentroids, lines, maxProjectedLine, height, maxSpace)
 
     s = symbol.copy()
 
@@ -48,7 +54,7 @@ def extractFeatures(symbol, maxSpace,aspectratio=0):
 
     countV = 0
     countInvertedV = 0
-    if(checkLines(symbol.shape[1], symbol.shape[0], len(lines), maxSpace, len(Bblobs), len(Wblobs))):
+    if(checkLines(width, height, len(lines), maxSpace, len(Bblobs), len(Wblobs))):
         skelImg = thin(s)
         countV = findV(skelImg)
         countInvertedV = findVinverted(skelImg)
@@ -65,8 +71,5 @@ def extractFeatures(symbol, maxSpace,aspectratio=0):
     features.append(upOrdown)
     features.append(countV)
     features.append(countInvertedV)
-    if(aspectratio == 0):
-        features.append(symbol.shape[0]/symbol.shape[1])
-    else:
-        features.append(aspectratio)
+    features.append(aspectratio)
     return features, BlackCentroids, WhiteCentroids

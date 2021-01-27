@@ -37,7 +37,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
     if(isHorizontal):
         segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemoval(binarizedImg)
     else:
-        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects = staffRemovalNonHorizontal(binarizedImg)
+        segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects ,widths,heights= staffRemovalNonHorizontal(binarizedImg)
 
     outFileName = filename.split('.')[0]
     f = open(outputFolder + '/g' + outFileName+'.txt', "w")
@@ -52,6 +52,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
         accidental = ""
         for j, image in enumerate(seg):
             if checkNumList[i][j] == 1:
+                #cv2.imwrite("num"+str(i)+"_"+str(j)+".png",image*255)
                 features = extractDigitsFeatures(image)
                 result = loaded_digits_model.predict([features])
                 c = result[0]
@@ -66,12 +67,12 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                 if(isHorizontal):
                     features, Bblobs, Wblobs = extractFeatures(image, maxSpace)
                 else:
-                    features, Bblobs, Wblobs = extractFeatures(image, maxSpace,segAspects[i][j])
+                    features, Bblobs, Wblobs = extractFeatures(image, maxSpace,segAspects[i][j],widths[i][j],heights[i][j])
 
-                if((len(Bblobs)+len(Wblobs)) > 0 and features[5]<=3 and features[4]<=3):
+                if((len(Bblobs)+len(Wblobs)) > 0):
                     print("f : ",i,j)
                     print(features)
-                    cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
+                    #cv2.imwrite(str(i)+"_"+str(j)+".png",image*255)
                     ClassifierVote = loaded_symbols_model.predict([features])[0]
                     if(isHorizontal):
                         className, Notes, duration = NoteOut(ClassifierVote, Bblobs, Wblobs, segContoursDim[i][j][2], segContoursDim[i][j][0], segPeakMids[i], segWidths[i])
@@ -86,6 +87,7 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
                     f.write(lineOut)
                 else:
                     # call accidentals classifier
+                    #cv2.imwrite("acc"+str(i)+"_"+str(j)+".png",image*255)
                     hasAccidental = True
                     features = extractAccedintalsFeatures(image)
                     result = loaded_accedintals_model.predict([features])

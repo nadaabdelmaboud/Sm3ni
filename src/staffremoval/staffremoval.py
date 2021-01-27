@@ -205,7 +205,7 @@ def isNum(imgContours):
         ##### first condition xminC , xminN , xmaxC, xmaxN are nearly equal#####
         #####second condition ymaxC < yminN #########
         isnotNUM = height / width > 4
-        if(abs(XmaxC - XminC) >= 3 and abs(XmaxN - XminN) >= 3 and YmaxC < YminN and not isnotNUM):
+        if(abs(XmaxC - XminC) >= 4 and abs(XmaxN - XminN) >= 4 and YmaxC <= YminN and not isnotNUM):
             isNUMList[index] = 1
             isNUMList[index + 1] = 1
     return isNUMList
@@ -300,8 +300,10 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
     imgSymbols=[]
     imgSymbolsNoStaff=[]
     aspects=[]
+    widths=[]
+    heights=[]
     index=0
-    h,w = imgWithStaff.shape
+    h = imgWithStaff.shape[0]
     errorRotation=[]
     for contour in contours:
         x = contour[:,1]
@@ -315,6 +317,8 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
 
     for Xmin,Xmax,Ymin,Ymax in imgRealDim:
         aspects.append((Ymax-Ymin)/(Xmax-Xmin))
+        widths.append(Xmax-Xmin)
+        heights.append(Ymax-Ymin)
         imgSymbol = imgWithStaff[0:h,int(Xmin):int(Xmax+1)]
         imgSymbolNoStaff = imgWithoutStaff[0:h,int(Xmin):int(Xmax+1)]
 
@@ -342,7 +346,7 @@ def getContoursDeskewed(imgWithStaff,imgWithoutStaff):
         imgSymbols.append(imgSymbol)
         imgSymbolsNoStaff.append(imgSymbolNoStaff)
         index+=1
-    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList,aspects,errorRotation
+    return imgSymbols,imgSymbolsNoStaff,imgContours,isNUMList,aspects,errorRotation,widths,heights
 
 #################Second method
 
@@ -362,9 +366,11 @@ def staffRemovalNonHorizontal(BinarizedImage):
     segContoursPeakmids=[]
     segContoursWidth=[]
     segAspects=[]
+    dimWidth=[]
+    dimHeight=[]
     i=0
     for imgSeg in imgSegments:
-        imgContours,imgContoursNoStaff,imgContoursDim,isNum,aspects,errorRotation = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
+        imgContours,imgContoursNoStaff,imgContoursDim,isNum,aspects,errorRotation,w,h = getContoursDeskewed(imgSegmentsStaff[i],imgSeg)
         segContourWidth=[]
         segContourPeakmids=[]
         #remove staff from array of imgs
@@ -383,5 +389,7 @@ def staffRemovalNonHorizontal(BinarizedImage):
         segContoursPeakmids.append(segContourPeakmids)
         segContoursWidth.append(segContourWidth)
         segAspects.append(aspects)
+        dimWidth.append(w)
+        dimHeight.append(h)
         i+=1
-    return segContours,segContoursDim,staffS,checkNumList,segContoursPeakmids,segContoursWidth,segAspects
+    return segContours,segContoursDim,staffS,checkNumList,segContoursPeakmids,segContoursWidth,segAspects,dimWidth,dimHeight
