@@ -31,12 +31,12 @@ def extractFeatures(symbol, maxSpace,aspectratio=0,width=0,height=0):
     if(nOfBlack == 0):
         nOfWhite, WhiteCentroids, Wblobs = detectWhiteBlob(blobOut, maxSpace)
     nOfChords, ChordsCentroids, Cblobs = detectOneLinedChords(blobOut, maxSpace)
-
+    print("Chords ",ChordsCentroids)
     nOfBlack, BlackCentroids, Bblobs, nOfWhite, WhiteCentroids, Wblobs = setBlobsProperties(
         nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfChords, ChordsCentroids, Bblobs, Wblobs, Cblobs)
     upOrdown = setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite,
                                  WhiteCentroids, lines, maxProjectedLine, height, maxSpace)
-
+    print("AFTER BLACK ",BlackCentroids)
     s = symbol.copy()
 
     for B in Bblobs:
