@@ -4,6 +4,8 @@ from statistics import mode,variance
 from skimage.measure import find_contours
 from skimage.morphology import thin
 from preprocessing.preprocessing import deskew,rotateBy
+import skimage.measure as measure
+
 
 def rowProjection(img):
     proj = np.sum(img,1)
@@ -121,36 +123,53 @@ def segmenting(BinarizedImage,thres):
     imgSegments = imgStaffSegments(img,segMids,segWidth,maxSpace,img,False)
     return imgSegments,maxSpace
 
-def removeStaffRow(imgOriginal,midPoint,curWidth):
-    thresPixel=curWidth
+def removeStaffRow(imgOriginal,midPoint,curWidth,index=0):
+    thresPixel=curWidth+1
     for i in range(imgOriginal.shape[1]):
-        pixelSum= sum(imgOriginal[midPoint-curWidth:midPoint+curWidth,i:i+1])
+        pixelSum= sum(imgOriginal[int(midPoint-curWidth):int(midPoint+curWidth),i:i+1])
         if(pixelSum<=thresPixel):
             imgOriginal[midPoint-curWidth:midPoint+curWidth,i:i+1]=0
     return imgOriginal
 
-def removeStaffLines(imgSegments):
+
+def removeStaffLines(imgSegments,maxSpace=0):
     #remove staff from array of imgs of segments
     imgsStaffRemoved=[]
     segPeakMids=[]
     segWidths=[]
+    tmpPeaksMids=[]
+    tmpStaffWidth=[]
+    maxSpace=int(maxSpace)
     for simg in imgSegments:
         maxProjection,result=rowProjection(simg)
         staffWidth,peaksMids=calcStaffPos(result,maxProjection,0.6)
+        tmpPeaksMids=peaksMids
+        tmpStaffWidth=staffWidth
+        peaksMids=list(peaksMids)
+        staffWidth=list(staffWidth)
+        newWidth=staffWidth[0]+2
+        peaksMids.insert(0,peaksMids[0]-maxSpace-int(staffWidth[0]/2)-int(newWidth/2))
+        staffWidth.insert(0,newWidth)
+        peaksMids.insert(0,peaksMids[0]-maxSpace-int(staffWidth[0]/2)-int(newWidth/2))
+        staffWidth.insert(0,newWidth)
+        newWidth=staffWidth[len(staffWidth)-1]+2
+        peaksMids.append(peaksMids[len(peaksMids)-1]+maxSpace+int(staffWidth[len(staffWidth)-1]/2)+int(newWidth/2))
+        staffWidth.append(newWidth)
+        peaksMids=np.array(peaksMids)
+        staffWidth=np.array(staffWidth)
         simg=simg.astype(np.float)
         ST=np.ones((2,1))
         simg=cv2.dilate(simg,ST)
         for i in range(len(peaksMids)):
-            simg=removeStaffRow(simg,peaksMids[i],staffWidth[i])
+            simg=removeStaffRow(simg,peaksMids[i],staffWidth[i],i)
         ST=np.ones((1,2))
         simg=cv2.dilate(simg,ST)
         simg=1-simg
         imgsStaffRemoved.append(simg)
-        segPeakMids.append(peaksMids)
-        segWidths.append(staffWidth)
+        segPeakMids.append(tmpPeaksMids)
+        segWidths.append(tmpStaffWidth)
     return imgsStaffRemoved,segPeakMids,segWidths
     #return array of images without staff
-
 
 def checkOverlapped(c,imgContours):
     cXmin,cXmax,cYmin,cYmax = c
@@ -167,6 +186,8 @@ def filterContours(imgContours,twoDim=False,imgSlice=[]):
         width = XmaxC - XminC
         height = YmaxC - YminC
         if height == 0 or width == 0:
+            continue
+        if(width<=5 and height>2*width):
             continue
         isRectH = width / height > 4 and height <= 6
         isRectV = height / width > 4 and width <= 6
@@ -214,6 +235,7 @@ def getImageContours(imgsStaffRemoved):
     segContours=[]
     checkNumList = []
     contoursDim = []
+    index=0
     for seg in imgsStaffRemoved:
         contours = find_contours(seg, 0.8)
         imgContours=[]
@@ -222,24 +244,37 @@ def getImageContours(imgsStaffRemoved):
             x = contour[:,1]
             y = contour[:,0]
             [Xmin, Xmax, Ymin, Ymax] = [np.amin(x), np.amax(x), np.amin(y), np.amax(y)]
-            imgContours.append([Xmin, Xmax, Ymin, Ymax])
+            imgSymbol=seg[int(Ymin):int(Ymax+1),int(Xmin):int(Xmax+1)]
+            imgSymbol=1-imgSymbol
+            labels = measure.label(imgSymbol)
+            props = measure.regionprops(labels)
+            imgSymbol=1-imgSymbol
+            for prop in props:
+                minr, minc, maxr, maxc = prop.bbox
+                minr+=Ymin
+                maxr+=Ymin
+                minc+=Xmin
+                maxc+=Xmin
+                imgContours.append([minc, maxc, minr, maxr])
+
 
         imgContours = filterContours(imgContours)
         isNUMList = isNum(imgContours)
 
         for Xmin,Xmax,Ymin,Ymax in imgContours:
             imgSymbol=seg[int(Ymin):int(Ymax+1),int(Xmin):int(Xmax+1)]
+            cv2.imwrite("contours/"+str(index)+".png",imgSymbol*255)
             imgSymbols.append(imgSymbol)
+            index+=1
 
         segContours.append(imgSymbols)
         checkNumList.append(isNUMList)
         contoursDim.append(imgContours)
     return segContours,checkNumList,contoursDim
-
 ##########################################First Method for Scanned Images or when staff lines are horizontal
 def staffRemoval(BinarizedImage):
     imgsegs,maxSpace = segmenting(BinarizedImage,20)
-    imgsStaffRemoved,segPeakMids,segWidths = removeStaffLines(imgsegs)
+    imgsStaffRemoved,segPeakMids,segWidths = removeStaffLines(imgsegs,maxSpace)
     segContours,checkNumList,segContoursDim = getImageContours(imgsStaffRemoved)
     return segContours,segContoursDim,maxSpace,checkNumList,segPeakMids,segWidths
 
