@@ -3,8 +3,7 @@
 <p align="center">
 <img  src="https://i.ibb.co/27bfXmn/Sm3ni-logos-transparent.png" width="320" align="center" alt="Sm3ni Logo"  />
 
-[![GitHub forks](https://img.shields.io/github/forks/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/network/members) [![GitHub Repo stars](https://img.shields.io/github/stars/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/stargazers) [![GitHub contributors](https://img.shields.io/github/contributors/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/graphs/contributors) 
-![GitHub](https://img.shields.io/github/license/nadaabdelmaboud/Sm3ni)[
+[![GitHub forks](https://img.shields.io/github/forks/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/network/members) [![GitHub Repo stars](https://img.shields.io/github/stars/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/stargazers) [![GitHub contributors](https://img.shields.io/github/contributors/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/graphs/contributors)[
 ![GitHub issues](https://img.shields.io/github/issues/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/issues)
 </p>
 
@@ -32,10 +31,11 @@
 	* [Generating Output](#Generating-Output)
 		* [Text Output](#Sample-Text-Output)
 		* [Audio Output](#Sample-Audio-Output)
-5. [Run](#Run)
-6. [Contributing](#Contributing)
-7. [Contributors](#Stay-in-touch)
-8. [License](#License)
+3. [Tools](#Tools)
+4. [Run](#Run)
+5. [Contributing](#Contributing)
+6. [Contributors](#Stay-in-touch)
+7. [License](#License)
 
 ## Description
 
