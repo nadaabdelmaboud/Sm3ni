@@ -8,13 +8,12 @@ def checkBeams(width, height, linesCount, maxSpace):
     return False
 
 
-def RemoveHorizontalAndDiagonalLines(img, originalImg, maxSpace, linesCount):
-    if(not checkBeams(img.shape[1], img.shape[0], linesCount, maxSpace)):
+def RemoveHorizontalAndDiagonalLines(img, originalImg, maxSpace, linesCount,height,width):
+    if(not checkBeams(width, height,linesCount, maxSpace)):
         return img, 0, originalImg
 
     removed = np.copy(img)
     labelImg = label(img)
-    height, width = img.shape
     regions = regionprops(labelImg)
     diagonal = []
     for r in regions:
@@ -37,12 +36,13 @@ def RemoveHorizontalAndDiagonalLines(img, originalImg, maxSpace, linesCount):
     return removed, count, originalImg
 
 
-def detectBeams(img, maxSpace):
+def detectBeams(img, maxSpace,h,w):
     img = np.array(img)
     orig = np.copy(1-img)
-    img, peaksMids, maxProjection, width = removeSymbolVerticalLines(
-        img, maxSpace)
+    img, peaksMids, maxProjection, width = removeSymbolVerticalLines(img, maxSpace)
+
     img = np.array(img)
-    removed, count, orig = RemoveHorizontalAndDiagonalLines(
-        1-img, orig, maxSpace, len(peaksMids))
+
+    removed, count, orig = RemoveHorizontalAndDiagonalLines(1-img, orig, maxSpace, len(peaksMids),h,w)
+
     return removed, count, 1-orig, peaksMids, maxProjection

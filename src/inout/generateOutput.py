@@ -26,7 +26,6 @@ def getNoteName(row, col, peaksMids, width,maxSpace):
 
     while len(widths) < 5:
         widths.append(widths[len(widths)-1])
-    print("note ",row,col,segment,widths)
     if(row == segment[0] or (row <= segment[0]+threshold and row >= segment[0]-threshold)):
         note = "f2"
     if(row == segment[1] or (row <= segment[1]+threshold and row >= segment[1]-threshold)):
