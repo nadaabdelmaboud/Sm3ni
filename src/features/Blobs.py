@@ -58,7 +58,6 @@ def detectBlob(symbol, maxSpace, widthError):
         isBlob = testBlob(prop, maxSpace, widthError)
         if(isBlob):
             minr, minc, maxr, maxc = prop.bbox
-            # blobSymbol=symbol[minr:maxr,minc:maxc]
             blobs.append(prop.bbox)
             centriods.append(prop.centroid)
             numBlobs = numBlobs+1
@@ -181,7 +180,6 @@ def setBlobsProperties(nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, nOfCh
 
 def setBlobsWithLines(nOfBlack, BlackCentroids, nOfWhite, WhiteCentroids, lines, maxProjectedLine, height, error,Y):
     # 0 for down , 1 for up , -1 for no blobs
-    # error=maxSpace
     thres = Y+height-maxProjectedLine-1
     thres = thres+error
     if(nOfBlack > 0):

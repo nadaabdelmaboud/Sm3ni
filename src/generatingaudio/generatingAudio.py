@@ -2,6 +2,9 @@ import numpy as np
 from scipy.io.wavfile import write
 
 
+#CREDITS TO How to Play Music Using Mathematics in Python Articale WRITTEN BY Nishu Jain
+#https://towardsdatascience.com/mathematics-of-music-in-python-b7d838c84f72
+
 noteFreq = {'c1' : 261.6 , 'c#1': 277.2 , 'c2' : 523.3 , 'c#2' : 554.4 ,
             'd1' : 293.7 , 'd#1': 311.1 , 'd2' : 587.3 , 'd#2' : 622.3 ,
             'e1' : 329.6 , 'e#1': 329.6 , 'e2' : 659.3 , 'e#2' : 659.3 ,
@@ -16,9 +19,9 @@ sampleRate = 44100
 def getWave(duration , freq):
     
     A = 4096
-    t = np.linspace(0, duration, int(sampleRate * duration));
-    wave = A * np.sin(2 * np.pi * freq * t);
-    return wave;
+    t = np.linspace(0, duration, int(sampleRate * duration))
+    wave = A * np.sin(2 * np.pi * freq * t)
+    return wave
 
 
 
@@ -32,7 +35,9 @@ def getAudio(notes,durations):
     
 def readingNotesFromFile(filePath):
     f = open(filePath , "r")
-    return f.read()
+    s = f.read()
+    f.close()
+    return s
 
 
 
@@ -109,9 +114,6 @@ def generateAudio(inputTextFilePath,OutputAudioPath = '',audioName = 'audio'):
           
             
 
-
-
-generateAudio('/home/hager/college/IP/IP-OMR/src/generatingaudio/01.txt')
 
 
 

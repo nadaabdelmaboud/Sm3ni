@@ -62,7 +62,7 @@ def filterPeaks(peaksMids,widths):
     for i in widths:
         sumW+=i
     avgW=sumW/len(widths)
-    #if i dont have flase peaks for clusters then this will result in a problem
+    #if i dont have false peaks for clusters then this will result in a problem
     var = variance(widths)
     for i in range(len(peaksMids)):
         if(widths[i]>=avgW or (var<1000 and (avgW-widths[i])<20)):

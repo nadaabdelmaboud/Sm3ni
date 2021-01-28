@@ -16,7 +16,7 @@ def deskew(img,isSymbol=False,axis=1):
                 maxScore=score
                 trueAngle=i
             i+=1
-        # print(trueAngle)
+       
     else:
         scoreArray = np.zeros(362)
         i = 0

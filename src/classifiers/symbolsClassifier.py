@@ -31,8 +31,6 @@ def load_dataset(path_to_dataset):
 
     return features, labels
 
-# This function will test all our classifiers on a specific feature set
-
 
 def run_experiment(path_to_dataset, random_seed, classifiers):
 

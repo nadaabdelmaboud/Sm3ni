@@ -6,6 +6,7 @@ from inout.generateOutput import *
 from features.checkScanned import *
 from features.extractfeatures import *
 from deskewing.deskewing import *
+from generatingaudio.generatingAudio import *
 import pickle
 import os
 import cv2
@@ -33,6 +34,7 @@ loaded_symbols_model = pickle.load(open(symbolsFileModel, 'rb'))
 loaded_accedintals_model = pickle.load(open(accedintalsFileModel, 'rb'))
 
 for fNum, filename in enumerate(os.listdir(inputFolder)):
+    print('Running on image',filename,'........')
     binarizedImg = preprocessing(inputFolder + '/' + filename)
     # copy is taken from binarized Image
     binarizedImgCopy = np.copy(binarizedImg)
@@ -129,3 +131,10 @@ for fNum, filename in enumerate(os.listdir(inputFolder)):
     if len(segContours) > 1:
         f.write("\n}")
     f.close()
+    generateAudio(outputFolder + '/' + outFileName+'.txt',outputFolder,outFileName)
+    print('Finished image ',filename)
+    print()
+
+print()
+print('##############################')
+print('Finished')

@@ -36,7 +36,6 @@ def deskew(img,isSymbol=False,axis=1):
                 maxScore=score
                 trueAngle=i
             i+=1
-        # print(trueAngle)
     else:
         scoreArray = np.zeros(362)
         i = 0
@@ -356,6 +355,5 @@ def preprocessing(imgPath):
         BinarizedImage=np.where(smoothedImage>t,1,0)
     BinarizedImage=1-BinarizedImage
     RotatedImage,angle=deskew(BinarizedImage)
-    #correctedImg=prespectiveCorrection(RotatedImage)
     BinarizedImage=1-RotatedImage
     return BinarizedImage
