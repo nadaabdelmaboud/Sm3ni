@@ -31,6 +31,11 @@ def deskew(img,isSymbol=False,axis=1):
     rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
     return rotated,trueAngle
 
+def rotateBy(img,trueAngle):
+    rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
+    return rotated
+
+
 def isReversed(segContours,maxSpace,maxLenStaffLines,heights = []):
     found = False
     if (len(heights) == 0):

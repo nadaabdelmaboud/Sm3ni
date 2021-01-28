@@ -3,7 +3,7 @@ import numpy as np
 from statistics import mode,variance
 from skimage.measure import find_contours
 from skimage.morphology import thin
-from preprocessing.preprocessing import deskew,rotateBy
+from deskewing.deskewing import deskew,rotateBy
 import skimage.measure as measure
 
 

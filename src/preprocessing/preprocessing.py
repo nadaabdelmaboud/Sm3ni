@@ -21,38 +21,7 @@ from pylab import imshow, gray, show
 from math import pi
 from scipy.ndimage import interpolation as inter
 from skimage.filters import threshold_otsu
-
-def deskew(img,isSymbol=False,axis=1):
-    if isSymbol:
-        scoreArray = np.zeros(182)
-        i = -45
-        maxScore=0
-        trueAngle=0
-        while i <= 45:
-            data = inter.rotate(img, i, reshape=False, order=0)
-            sumRow = np.sum(data, axis=axis)
-            score = np.sum((sumRow[1:] - sumRow[:-1]) ** 2)
-            if(score>maxScore):
-                maxScore=score
-                trueAngle=i
-            i+=1
-    else:
-        scoreArray = np.zeros(362)
-        i = 0
-        while i <= 360:
-            data = inter.rotate(img, i, reshape=False, order=0)
-            sumRow = np.sum(data, axis=axis)
-            score = np.sum((sumRow[1:] - sumRow[:-1]) ** 2)
-            scoreArray[i] = score
-            i+=1
-        scoreArray = np.array(scoreArray)
-        trueAngle = np.where(scoreArray == max(scoreArray))[0][0]
-    rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
-    return rotated,trueAngle
-
-def rotateBy(img,trueAngle):
-    rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
-    return rotated
+from deskewing.deskewing import deskew,rotateBy
 
 #copied from https://github.com/manuelaguadomtz/pythreshold/blob/master/pythreshold/local_th/feng.py
 
