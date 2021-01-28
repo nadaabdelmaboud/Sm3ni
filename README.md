@@ -40,6 +40,7 @@
 ## Description
 
 **Sm3ni** is an Optical Musical Recognition project written in python that converts music sheets images to a text file representing the musical notes then to a .wav audio file that represents the music sheet .
+
 This repo will contain our used pipeline for the OMR based on different cases for the input images . 
 ## Pipeline
 
@@ -49,14 +50,17 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 	* ### Smoothing 
 
 		>  We first apply a smoothing test by calculating the signal to noise ratio in the image .
+		
 		> If the **SNR** is above some threshold the **bilateral smoothing filter** is applied on the image
 
 	* ### Illumination
 		> Uneven illumination test is applied on the image
+		
 		> If the image is unevenly illuminated a contrast enhancement algorithm called **screened poisson contrast enhancement**  is applied on the image
 	
 	* ### Binarization
 		> If the image is unevenly illuminated we apply **Feng Local Thresholding** for low quality documented images.
+		
 		> If the image is evenly illuminated we apply **OTSU Local Thresholding** .
 		
 	* ### Deskewing
@@ -72,40 +76,60 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 	> Horizontal/Non-horizontal test is first applied on the image then 2 different techniques are applied based on the test.
 	* ### Horizontal Staff-Lines Removal
 		> Get **horizontal projection** of the image  
+		
 		> Find the peaks and get the staff-height and staff-space
+		
 		> Remove lines with width same as the peaks' width
 	* ### Non-Horizontal Staff-Lines Removal
 		> Apply **run length encoding**  .
+		
 		> Find the mod of consecutive black pixels to be the staff height and mod of consecutive white pixels to be the staff-space.
+		
 		> Remove all regions with height more than the staff height.
+		
 		> Get the removed lines image by subtracting the removed symbols image from the original image.
+		
 
 	![Staff-Removal Output](https://i.ibb.co/F6Kqv4V/Untitled-Diagram-Page-3.png)
 * ## Segmentation
 	![Segmentation](https://i.ibb.co/1zT175S/Untitled-Diagram-Page-4.png)
 	> Segmenting the image into staff-segments.
+	
 	> Segmenting each staff segment to the musical symbols.
+	
 	> Detect **Clef** position and rotate the whole image 180 degree if it exists in the bottom right corner.
+	
 	> For non horizontal images **de-skew** each symbol from -45 to 45 degree till getting the right angle for rotation from projection sum . 
+	
 	
 * ## Features Extraction
 	> From this step we get a feature vector describe each symbol that will be used later in the classification . 
+	
 	* ### Stems
 		> Detect stems in the symbol by vertical projection then remove them.
+		
 	* ### Notes-Heads
 		> Get all regions left in the symbol and threshold on each region by **solidity**,**eccentricity**,**area**,**width** and **height** with respect to the **staff-space**
+		
 		> count all valid heads to be number of black heads .
+		
 		> Apply **region filling** to the symbol then repeat the previous steps.
+		
 		> count all valid heads to be number of white heads.
 
 	* ### Beams
 		> Get all regions left in the symbol then apply thresholding by **aspect ratio** to detect number of beams lines.
+		
 	* ### UporDown
 		> Detect whether notes is up or down by comparing the center of the highest head with the tallest stem in the symbol .
+		
 	* ### Flags
 		> Apply **skeletonization** to the symbol.
+		
 		> Find all **connected right down/left up paths** with thresholding on the path's length.
+		
 		> Count number of valid flags.
+		
 * ## Classification
 	![Classification](https://i.ibb.co/H2Zr2ff/Untitled-Diagram-Page-5-1.png)
 * ## Generating Output
