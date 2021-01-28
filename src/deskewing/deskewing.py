@@ -31,24 +31,34 @@ def deskew(img,isSymbol=False,axis=1):
     rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
     return rotated,trueAngle
 
-def isReversed(segContours,maxSpace,maxLenStaffLines):
+def isReversed(segContours,maxSpace,maxLenStaffLines,heights = []):
     found = False
-    print(segContours)
-    print("maxLenStaffLines",maxLenStaffLines)
-    print("maxSpace",maxSpace)
-    for contour in segContours:
-        if(found == True):
-            break
-        for Xmin,Xmax,Ymin,Ymax in contour:
-            soulKeySearching = Ymax - Ymin
-
-            # detecting Soul Key
-            if (soulKeySearching > 6*maxSpace):
-                soulKeyDist = Xmin
-                found = True
+    if (len(heights) == 0):
+        for contour in segContours:
+            if(found == True):
                 break
+            for Xmin,Xmax,Ymin,Ymax in contour:
+                soulKeySearching = Ymax - Ymin
 
-    print("soulKeyDist",soulKeyDist)
+                # detecting Soul Key
+                if (soulKeySearching > 6*maxSpace):
+                    soulKeyDist = Xmin
+                    found = True
+                    break
+    else:
+        maxValue = 0
+        maxIndex = 0
+        indexInSeg = 0
+        #getting the clef in the first segment only
+        for H in heights[0]:
+            if H > maxValue:
+                maxValue = H
+                maxIndex = indexInSeg
+            indexInSeg+=1
+
+        #after detecting clef, now getting the xmin of this contour
+        soulKeyDist = segContours[0][maxIndex][0]
+
     if (soulKeyDist > 0.5 * maxLenStaffLines):
         return True
     else:

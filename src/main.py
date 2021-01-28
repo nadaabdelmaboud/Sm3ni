@@ -5,6 +5,7 @@ from classifiers.accedintalsClassifier import *
 from inout.generateOutput import *
 from features.checkScanned import *
 from features.extractfeatures import *
+from deskewing.deskewing import *
 import pickle
 import os
 import cv2
@@ -23,9 +24,9 @@ fileExists = False
 inputFolder = args.inputfolder
 outputFolder = args.outputfolder
 
-digitsFileModel = 'models/digits_model.sav'
-symbolsFileModel = 'models/symbols_model.sav'
-accedintalsFileModel = 'models/accedintals_model.sav'
+digitsFileModel = '../models/digits_model.sav'
+symbolsFileModel = '../models/symbols_model.sav'
+accedintalsFileModel = '../models/accedintals_model.sav'
 
 loaded_digits_model = pickle.load(open(digitsFileModel, 'rb'))
 loaded_symbols_model = pickle.load(open(symbolsFileModel, 'rb'))
@@ -33,12 +34,28 @@ loaded_accedintals_model = pickle.load(open(accedintalsFileModel, 'rb'))
 
 for fNum, filename in enumerate(os.listdir(inputFolder)):
     binarizedImg = preprocessing(inputFolder + '/' + filename)
+    # copy is taken from binarized Image
+    binarizedImgCopy = np.copy(binarizedImg)
+    maxLenStaffLines = binarizedImg.shape[1]
+
+    heights = []
     isHorizontal = getHorizontalLines(binarizedImg)
     origImg=(binarizedImg*255).astype("uint8")
     if(isHorizontal):
         segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemoval(binarizedImg)
     else:
         segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects ,widths,heights,Ys= staffRemovalNonHorizontal(binarizedImg)
+
+    ################check if image is reversed##############################
+    isImageReversed = isReversed(segContoursDim,maxSpace,maxLenStaffLines,heights)
+    if (isImageReversed == True):
+        rotatedImage = inter.rotate(binarizedImgCopy, 180, reshape=True, order=0)
+        isHorizontal = getHorizontalLines(rotatedImage)
+        origImg=(rotatedImage*255).astype("uint8")
+        if(isHorizontal):
+            segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths = staffRemoval(rotatedImage)
+        else:
+            segContours, segContoursDim, maxSpace, checkNumList, segPeakMids, segWidths, segAspects ,widths,heights,Ys= staffRemovalNonHorizontal(rotatedImage)
 
     outFileName = filename.split('.')[0]
     f = open(outputFolder + '/' + outFileName+'.txt', "w")
