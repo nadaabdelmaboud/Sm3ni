@@ -45,7 +45,7 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 
 * ## Preprocessing
 
-	![Preprocessing](https://i.ibb.co/gZNTg13/FP.png)
+	![Preprocessing](https://i.ibb.co/0Qw2XZx/Untitled-Diagram-Page-7-1.png)
 	* ### Smoothing 
 
 		>  We first apply a smoothing test by calculating the signal to noise ratio in the image .
@@ -63,11 +63,11 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 
 		> Rotate the image from 0 to 360 degree then find the angle of maximum horizontal projection sum and rotate the image with the right angle .
 	
-		![Preprocessing Outputs](https://i.ibb.co/CMvmnVp/POUT.png)
+		![Preprocessing Outputs](https://i.ibb.co/jkkWt9j/Untitled-Diagram-Page-1.png)
 
 * ## Staff-Lines Removal
 
-	![Staff-Removal](https://i.ibb.co/5rbBjQm/Untitled-Diagram-Page-2.png)
+	![Staff-Removal](https://i.ibb.co/BnbJT6j/Untitled-Diagram-Page-2-1.png)
 
 	> Horizontal/Non-horizontal test is first applied on the image then 2 different techniques are applied based on the test.
 	* ### Horizontal Staff-Lines Removal
@@ -80,9 +80,9 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 		> Remove all regions with height more than the staff height.
 		> Get the removed lines image by subtracting the removed symbols image from the original image.
 
-	![Staff-Removal Output](https://i.ibb.co/G3GFjKq/Staff.png)
+	![Staff-Removal Output](https://i.ibb.co/F6Kqv4V/Untitled-Diagram-Page-3.png)
 * ## Segmentation
-	![Segmentation](https://i.ibb.co/dQWhJ06/SEG.png)
+	![Segmentation](https://i.ibb.co/1zT175S/Untitled-Diagram-Page-4.png)
 	> Segmenting the image into staff-segments.
 	> Segmenting each staff segment to the musical symbols.
 	> Detect **Clef** position and rotate the whole image 180 degree if it exists in the bottom right corner.
@@ -107,9 +107,9 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 		> Find all **connected right down/left up paths** with thresholding on the path's length.
 		> Count number of valid flags.
 * ## Classification
-	![Classification](https://i.ibb.co/pzZ6K8D/Untitled-Diagram-Page-5.png)
+	![Classification](https://i.ibb.co/H2Zr2ff/Untitled-Diagram-Page-5-1.png)
 * ## Generating Output
-	![Output](https://i.ibb.co/H4KBG2B/Output.png)
+	![Output](https://i.ibb.co/94cLYrR/Untitled-Diagram-Page-6.png)
 	* #### Sample Text Output
 
 		![Text](https://i.ibb.co/zrbHF7R/Screenshot-from-2021-01-28-19-58-57.png)	
