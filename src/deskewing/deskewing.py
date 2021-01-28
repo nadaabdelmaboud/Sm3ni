@@ -31,16 +31,26 @@ def deskew(img,isSymbol=False,axis=1):
     rotated = inter.rotate(img, trueAngle, reshape=True, order=0)
     return rotated,trueAngle
 
-def isSoulKey(segContours):
-    for Xmin,Xmax,Ymin,Ymax in segContours:
-        soulKeySearching = (Ymax - Ymin) / (Xmax - Xmin)
-
-        if (soulKeySearching > 2.5 and soulKeySearching < 2.9):
-            soulKeyDist = Xmin
+def isReversed(segContours,maxSpace,maxLenStaffLines):
+    found = False
+    print(segContours)
+    print("maxLenStaffLines",maxLenStaffLines)
+    print("maxSpace",maxSpace)
+    for contour in segContours:
+        if(found == True):
             break
+        for Xmin,Xmax,Ymin,Ymax in contour:
+            soulKeySearching = Ymax - Ymin
 
-    if (soulKeyDist > 250):
-        return False
-    else:
+            # detecting Soul Key
+            if (soulKeySearching > 6*maxSpace):
+                soulKeyDist = Xmin
+                found = True
+                break
+
+    print("soulKeyDist",soulKeyDist)
+    if (soulKeyDist > 0.5 * maxLenStaffLines):
         return True
+    else:
+        return False
     
