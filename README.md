@@ -3,9 +3,9 @@
 <p align="center">
 <img  src="https://i.ibb.co/27bfXmn/Sm3ni-logos-transparent.png" width="320" align="center" alt="Sm3ni Logo"  />
 
-[![GitHub forks](https://img.shields.io/github/forks/nadaabdelmaboud/IP-OMR)](https://github.com/nadaabdelmaboud/IP-OMR/network/members) [![GitHub Repo stars](https://img.shields.io/github/stars/nadaabdelmaboud/IP-OMR)](https://github.com/nadaabdelmaboud/IP-OMR/stargazers) [![GitHub contributors](https://img.shields.io/github/contributors/nadaabdelmaboud/IP-OMR)](https://github.com/nadaabdelmaboud/IP-OMR/graphs/contributors) 
-![GitHub](https://img.shields.io/github/license/nadaabdelmaboud/IP-OMR)[
-![GitHub issues](https://img.shields.io/github/issues/nadaabdelmaboud/IP-OMR)](https://github.com/nadaabdelmaboud/IP-OMR/issues)
+[![GitHub forks](https://img.shields.io/github/forks/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/network/members) [![GitHub Repo stars](https://img.shields.io/github/stars/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/stargazers) [![GitHub contributors](https://img.shields.io/github/contributors/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/graphs/contributors) 
+![GitHub](https://img.shields.io/github/license/nadaabdelmaboud/Sm3ni)[
+![GitHub issues](https://img.shields.io/github/issues/nadaabdelmaboud/Sm3ni)](https://github.com/nadaabdelmaboud/Sm3ni/issues)
 </p>
 
 
