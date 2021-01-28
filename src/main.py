@@ -25,9 +25,9 @@ fileExists = False
 inputFolder = args.inputfolder
 outputFolder = args.outputfolder
 
-digitsFileModel = '../models/digits_model.sav'
-symbolsFileModel = '../models/symbols_model.sav'
-accedintalsFileModel = '../models/accedintals_model.sav'
+digitsFileModel = 'models/digits_model.sav'
+symbolsFileModel = 'models/symbols_model.sav'
+accedintalsFileModel = 'models/accedintals_model.sav'
 
 loaded_digits_model = pickle.load(open(digitsFileModel, 'rb'))
 loaded_symbols_model = pickle.load(open(symbolsFileModel, 'rb'))
