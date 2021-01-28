@@ -35,7 +35,7 @@
 5. [Run](#Run)
 6. [Contributing](#Contributing)
 7. [Contributors](#Stay-in-touch)
-8. [License](#Lisence)
+8. [License](#License)
 
 ## Description
 
@@ -81,7 +81,7 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 		
 		> Remove lines with width same as the peaks' width
 	* ### Non-Horizontal Staff-Lines Removal
-		> Apply **run length encoding**  .
+		> Apply **run length encoding** .
 		
 		> Find the mod of consecutive black pixels to be the staff height and mod of consecutive white pixels to be the staff-space.
 		
@@ -103,7 +103,7 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 	
 	
 * ## Features Extraction
-	> From this step we get a feature vector describe each symbol that will be used later in the classification . 
+	> From this step we get a feature vector describing each symbol that will be used later in the classification . 
 	
 	* ### Stems
 		> Detect stems in the symbol by vertical projection then remove them.
@@ -139,7 +139,21 @@ This repo will contain our used pipeline for the OMR based on different cases fo
 		![Text](https://i.ibb.co/zrbHF7R/Screenshot-from-2021-01-28-19-58-57.png)	
 	* #### Sample Audio Output
 		[Audio.wav](https://drive.google.com/file/d/13Y3azkBrkqGE6kC38r5cLsaKzd7YfgR7/view?usp=sharing)
+
+## Tools
+* Python
+* Numpy
+* Skimage
+* Opencv
+* Os : Linux-Ubuntu 		
+		
 ## Run
+```bash
+$ conda env create -f requirements.yml
+$ conda activate omrproject
+$ python src/main.py <Input Folder Absolute Path> <Output Folder Absolute Path>
+```
+ 
 ## Contributing
 	
 ```bash
